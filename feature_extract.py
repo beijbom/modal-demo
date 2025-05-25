@@ -1,24 +1,21 @@
-import modal
-import open_clip
-import torch
 import os
 import time
-from PIL import Image
+
+import modal
+import open_clip
 import requests
+import torch
+from PIL import Image
 
 image = modal.Image.debian_slim().pip_install_from_pyproject("pyproject.toml")
-app = modal.App("feature-extract-demo")
+app = modal.App("openclip-demo")
 volume = modal.Volume.from_name("clip-image-embeddings", create_if_missing=True)
 
-
-@app.cls(image=image, volumes={"/data": volume})
+@app.cls(image=image, volumes={"/data": volume}, retries=2)
 class ClipBatchExtractor:
-    def __init__(self):
-        self.model = None
-        self.preprocess = None
-
     @modal.enter()
     def load_model(self):
+        os.makedirs("/data/features", exist_ok=True)
         model_path = "/data/clip_model.pt"
         if os.path.exists(model_path):
             # Load model from volume
@@ -30,7 +27,11 @@ class ClipBatchExtractor:
         self.model, self.preprocess = model, preprocess
 
     @modal.method()
-    def embed(self,key: int):        
+    def embed(self,key: int): 
+        path = f"/data/features/{key}.pt"
+        if os.path.exists(path):
+            print(f"Feature file {path} already exists")
+            return       
         t0 = time.time()
         image_url = f"https://picsum.photos/200?{key}"
         image = Image.open(requests.get(image_url, stream=True).raw)
@@ -41,16 +42,23 @@ class ClipBatchExtractor:
         with torch.no_grad():
             image_features = self.model.encode_image(image)
         print(f"Image features extracted in {time.time() - t0} seconds")
-        
-        path = f"/data/features/{key}.pt"
-        os.makedirs("/data/features", exist_ok=True)
         torch.save(image_features, path)
 
-        
+    @modal.method()
+    def inspect(self):
+        path = f"/data/features/"
+        feature_file_count = len(os.listdir(path))
+        print(f"Found {feature_file_count} feature files")
+        one_feature_file = os.listdir(path)[0]
+        feature = torch.load(os.path.join(path, one_feature_file))
+        print(f"Feature shape: {feature.shape}")
     
 
 @app.local_entrypoint()
-def main():
-    ClipBatchExtractor().embed.spawn_map(range(100))
+def main(job_name: str):
+    if job_name == "submit":
+        ClipBatchExtractor().embed.spawn_map(range(100_000))
+    elif job_name == "inspect":
+        ClipBatchExtractor().inspect.remote()
 
 

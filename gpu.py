@@ -3,6 +3,8 @@ import modal
 app = modal.App()
 image = modal.Image.debian_slim().pip_install("torch", "numpy")
 
+
+# Try using T4, A100, A100-80GB and A100-80GB:2 
 @app.function(gpu="T4", image=image)
 def run():
     import torch
