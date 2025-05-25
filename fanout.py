@@ -3,21 +3,22 @@ import time
 
 app = modal.App("example-fanout")
 
-time_per_unit = 10
+time_per_job_seconds = 10
 
 @app.function()
-def multiplier(my_input:int):
-    time.sleep(time_per_unit)
-    return my_input * 2
-
-
+def my_job(job_id: int):
+    t0 = time.time()
+    print(f"Job {job_id} started")
+    time.sleep(time_per_job_seconds)
+    t1 = time.time()
+    print(f"Job {job_id} finished in {t1 - t0} seconds")
+    return t1 - t0
 
 @app.local_entrypoint()
 def main():
-    job_count = 1000
+    job_count = 100
     to = time.time()
-    print(list(multiplier.map(range(job_count))))
-    wallclock = time.time() - to
-    compute_time = job_count * time_per_unit
-    print(f"Wallclock: {wallclock}s, Compute: {compute_time}s")
+    cpu_clock = sum(list(my_job.map(range(job_count))))
+    wall_clock = time.time() - to
+    print(f"Wallclock: {wall_clock}s, Compute: {cpu_clock}s, Speedup: {wall_clock / cpu_clock}")
     
