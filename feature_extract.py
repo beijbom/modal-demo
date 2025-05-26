@@ -12,7 +12,7 @@ with image.imports():
     import time
     from PIL import Image
 
-@app.cls(image=image, volumes={"/data": volume}, retries=2, max_containers=200)
+@app.cls(image=image, volumes={"/data": volume}, retries=2, max_containers=200, timeout=30*60)
 class ClipBatchExtractor:
     @modal.enter()
     def load_model(self):

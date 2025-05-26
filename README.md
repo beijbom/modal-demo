@@ -15,18 +15,17 @@ The `uv run` prefix is b/c we use the uv package manager.
 * `uv run modal run web_api.py` -- hosting an API
 
 ## Massive data processing jobs
-* `feature_extract.py` -- 100k open clip feature extractions
+* `uv run modal run --detach feature_extract.py submit` -- submit 100k extractions
+* `uv run modal run --detach feature_extract.py inspect` -- check status
 
 ## Example "real" webapp
-See https://github.com/beijbom/yapml
-See `README.md` for details.
+* https://github.com/beijbom/yapml
+* Check `README.md` for details.
 
 ## Hyper parameter tuning, training, visualization and inference
-https://github.com/modal-labs/modal-examples/blob/main/06_gpu_and_ml/hyperparameter-sweep/hp_sweep_gpt.py
+* https://github.com/modal-labs/modal-examples/blob/main/06_gpu_and_ml/hyperparameter-sweep/hp_sweep_gpt.py
+* `uv run modal run hp_sweep_gpt.py`
 
 ## Training the DSVT backbone on modal.
-Go to https://github.com/beijbom/DSVT
-
-```
-uv run modal run --detach tools/scripts/modal_train.py --gpu a100 --n-gpus 4
-```
+* https://github.com/beijbom/DSVT
+* `uv run modal run --detach tools/scripts/modal_train.py --gpu a100 --n-gpus 4`
