@@ -1,17 +1,18 @@
-import os
-import time
-
 import modal
-import open_clip
-import requests
-import torch
-from PIL import Image
 
 image = modal.Image.debian_slim().pip_install_from_pyproject("pyproject.toml")
 app = modal.App("openclip-demo")
 volume = modal.Volume.from_name("clip-image-embeddings", create_if_missing=True)
 
-@app.cls(image=image, volumes={"/data": volume}, retries=2)
+with image.imports():
+    import open_clip
+    import torch
+    import requests
+    import os
+    import time
+    from PIL import Image
+
+@app.cls(image=image, volumes={"/data": volume}, retries=2, max_containers=200)
 class ClipBatchExtractor:
     @modal.enter()
     def load_model(self):
@@ -44,13 +45,16 @@ class ClipBatchExtractor:
         print(f"Image features extracted in {time.time() - t0} seconds")
         torch.save(image_features, path)
 
+
+@app.cls(image=image, volumes={"/data": volume}, retries=2)
+class ClipBatchInspector:
     @modal.method()
     def inspect(self):
-        path = f"/data/features/"
-        feature_file_count = len(os.listdir(path))
+        feature_folder = "/data/features/"
+        feature_file_count = len(os.listdir(feature_folder))
         print(f"Found {feature_file_count} feature files")
-        one_feature_file = os.listdir(path)[0]
-        feature = torch.load(os.path.join(path, one_feature_file))
+        one_feature_file = os.listdir(feature_folder)[0]
+        feature = torch.load(os.path.join(feature_folder, one_feature_file))
         print(f"Feature shape: {feature.shape}")
     
 
@@ -59,6 +63,6 @@ def main(job_name: str):
     if job_name == "submit":
         ClipBatchExtractor().embed.spawn_map(range(100_000))
     elif job_name == "inspect":
-        ClipBatchExtractor().inspect.remote()
+        ClipBatchInspector().inspect.remote()
 
 
