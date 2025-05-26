@@ -24,8 +24,10 @@ The `uv run` prefix is b/c we use the uv package manager.
 
 ## Hyper parameter tuning, training, visualization and inference
 * https://github.com/modal-labs/modal-examples/blob/main/06_gpu_and_ml/hyperparameter-sweep/hp_sweep_gpt.py
-* `uv run modal run hp_sweep_gpt.py`
+* `uv run modal serve hp_sweep_gpt.py`  ## Run the UI and tensorboard
+* `uv run modal run hp_sweep_gpt.py`  ## Run the actual hyper parameter sweep
 
 ## Training the DSVT backbone on modal.
+This uses 4 * 8 A100 GPUs.
 * https://github.com/beijbom/DSVT
 * `uv run modal run --detach tools/scripts/modal_train.py --gpu a100 --n-gpus 4`
