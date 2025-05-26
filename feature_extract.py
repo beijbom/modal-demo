@@ -7,7 +7,7 @@ volume = modal.Volume.from_name("clip-image-embeddings", create_if_missing=True)
 with image.imports():
     import open_clip
     import torch
-    import requests
+    import numpy as np
     import os
     import time
     from PIL import Image
@@ -33,12 +33,11 @@ class ClipBatchExtractor:
         if os.path.exists(path):
             print(f"Feature file {path} already exists")
             return       
-        t0 = time.time()
-        image_url = f"https://picsum.photos/200?{key}"
-        image = Image.open(requests.get(image_url, stream=True).raw)
-        image = self.preprocess(image).unsqueeze(0)
-        print(f"Image loaded in {time.time() - t0} seconds")
 
+        # Generate random image using numpy
+        random_image = np.random.randint(0, 255, (200, 200, 3), dtype=np.uint8)
+        image = Image.fromarray(random_image)        
+        image = self.preprocess(image).unsqueeze(0)
         t0 = time.time()
         with torch.no_grad():
             image_features = self.model.encode_image(image)
