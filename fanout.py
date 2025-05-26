@@ -1,5 +1,6 @@
-import modal
 import time
+
+import modal
 
 app = modal.App("example-fanout")
 

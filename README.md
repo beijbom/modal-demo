@@ -21,10 +21,12 @@ The `uv run` prefix is b/c we use the uv package manager.
 See https://github.com/beijbom/yapml
 See `README.md` for details.
 
-## Running real GPU workloads
+## Hyper parameter tuning, training, visualization and inference
+https://github.com/modal-labs/modal-examples/blob/main/06_gpu_and_ml/hyperparameter-sweep/hp_sweep_gpt.py
+
+## Training the DSVT backbone on modal.
 Go to https://github.com/beijbom/DSVT
 
-
 ```
-uv run modal run --detach tools/scripts/modal_train.py --gpu a100 --n-gpus 8 --lr "0.01"
+uv run modal run --detach tools/scripts/modal_train.py --gpu a100 --n-gpus 4
 ```
