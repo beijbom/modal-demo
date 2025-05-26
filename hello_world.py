@@ -1,6 +1,9 @@
 
 import modal
 
+# During the demo
+# Add a volume to the app. Store some data
+
 app = modal.App("example-hello-world")
 
 @app.function()
