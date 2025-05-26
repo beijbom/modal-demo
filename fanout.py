@@ -21,5 +21,5 @@ def main():
     to = time.time()
     cpu_clock = sum(list(my_job.map(range(job_count))))
     wall_clock = time.time() - to
-    print(f"Wallclock: {wall_clock}s, Compute: {cpu_clock}s, Speedup: {wall_clock / cpu_clock}")
+    print(f"Wallclock: {wall_clock}s, Compute: {cpu_clock}s, Speedup: {cpu_clock / wall_clock}")
     
