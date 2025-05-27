@@ -1,5 +1,5 @@
 # During demo 
-# curl -d '{"name": "Erik", "qty": 10}' -H "Content-Type: application/json" -X POST https://beijbom--web-api-py-f-dev.modal.run  
+# curl -d '{"name": "Erik", "qty": 10}' -H "Content-Type: application/json" -X POST https://beijbom--echo-api-f-dev.modal.run  
 # Show auto update
 # Show how to deploy
 
@@ -21,7 +21,7 @@ class Item(BaseModel):
 def f(item: Item):
     import boto3
     # do things with boto3...
-    return HTMLResponse(f"<html>Hello {item.name}!</html>")
+    return HTMLResponse(f"<html>Hello, friend {item.name}!</html>")
 
 
 
